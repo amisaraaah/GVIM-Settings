@@ -1,0 +1,47 @@
+Expands filename of the current file
+:echo expand('%')
+
+Count occurences
+:%s/example//gn
+
+Reloads gvim
+:e!
+
+
+======================== EMACS =========================
+
+$$ paste the following 4 lines at the end of your file
+
+// Local Variables:
+// verilog-library-directories:("." "../../subsystems/nss/rtl" "../../subsystems/css/rtl" "../../ip/nic400_v1/nic400_main_noc/logical/nic400_main_noc/nic400/verilog" )
+// verilog-library-extensions:(".v" ".h" ".vlg" ".sv")
+// End:
+
+
+$$ instantiate the module as shown
+
+nic400_main_noc u_main_noc_top ( /*AUTOINST*/
+);
+
+/* nic400_main_noc AUTO_TEMPLATE(
+                        .\(.*\)_dss_hifi_core_to_mnoc_128_axi     (dss_hifi_core_to_mnoc_128_axi.@"(downcase \\"\1\\")"[]),
+                        .\(.*\)_mnoc_to_peripheral_noc_32_axi    (mnoc_to_peripheral_noc_32_axi.@"(downcase \\"\1\\")"[]),
+                        .\(.*\)_mnoc_to_tiny_enclave_32_apb       (mnoc_to_tiny_enclave_32_apb.@"(downcase \\"\1\\")"[]),
+                        );
+*/
+nic400_main_noc u_nic400_main_noc (/*AUTOINST*/);
+
+$$ output is like ...
+nic400_main_noc u_nic400_main_noc (/*AUTOINST*/
+				   // Outputs
+				   .AWREADY_dss_audio_ss_to_mnoc_32_axi(dss_audio_ss_to_mnoc_32_axi.awready), // Templated
+				   .HWRITE_tiny_enclave_to_mnoc_32_ahbl(tiny_enclave_to_mnoc_32_ahbl.hwrite), // Templated
+				   .HSELx_tiny_enclave_to_mnoc_32_ahbl(tiny_enclave_to_mnoc_32_ahbl.hselx), // Templated
+				   .HREADY_tiny_enclave_to_mnoc_32_ahbl(tiny_enclave_to_mnoc_32_ahbl.hready), // Templated
+				   .clk0clk		(clk0clk));
+
+$$ For more settings refer this webpage: https://www.veripool.org/verilog-mode/help/
+
+$$ Run in terminal to generate the rtl
+emacs --batch nss_top.sv -f verilog-batch-auto
+
